@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void die(const char fmt[], ...)
+static void die(const char fmt[], ...)
 {
 	va_list args;
 	va_start(args, fmt);
