@@ -8,8 +8,8 @@ const double PI = 3.14159265358979323;
 void _fft(int n, C *v, int m, C *omega) {
     if (n == 1) return;
     C *even, *odd;
-	even = malloc((n / 2) * sizeof(*even));
-	odd = malloc((n / 2) * sizeof(*odd));
+	even = malloc(n * sizeof(*even));
+	odd = even + (n / 2);
     for (int i = 0; i < n / 2; i++)
 		even[i] = v[2 * i], odd[i] = v[2 * i + 1];
 
@@ -22,7 +22,6 @@ void _fft(int n, C *v, int m, C *omega) {
         v[i + n / 2] = even[i] - om * odd[i];
     }
 	free(even);
-	free(odd);
 }
 
 void fft(int n, double *v)
