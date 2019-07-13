@@ -1,13 +1,14 @@
 C := gcc
-CFLAGS := -std=c11 -O2
-LDFLAGS := $(shell pkg-config --libs jack)
+CFLAGS := -O2
+COMPILE = ${C} -std=c11 $(shell pkg-config --cflags sdl2) ${CFLAGS} $< -o $@ -c
+LDFLAGS := $(shell pkg-config --libs jack) $(shell pkg-config --libs sdl2) -lm
 objs := jack.o rambajz.o
 
 build-dir:
 	mkdir -p build
 
 build/%.o: src/%.c build-dir
-	${C} ${CFLAGS} $< -o $@ -c
+	${COMPILE}
 
 build/rambajz: ${patsubst %,build/%,${objs}}
 	gcc $^ -o $@ ${LDFLAGS}
