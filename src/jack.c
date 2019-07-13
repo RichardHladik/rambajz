@@ -46,8 +46,8 @@ void jack_setup(JackProcessCallback callback)
  * none. */
 void jack_connect_ports(void)
 {
-	const char **ins = jack_get_ports(jack_state.client, NULL, NULL,
-			JackPortIsPhysical | JackPortIsOutput);
+	const char **ins = jack_get_ports(jack_state.client, "mpv.*:out_0", NULL,
+			JackPortIsOutput);
 	const char **outs = jack_get_ports(jack_state.client, NULL, NULL,
 			JackPortIsPhysical | JackPortIsInput);
 	/* It's correct to assign all ports with JackPortsIs*Output* to *ins*,
