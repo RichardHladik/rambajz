@@ -1,7 +1,7 @@
 #include <jack/jack.h>
 
 void jack_init_client(void);
-void jack_setup(JackProcessCallback);
+void jack_setup(JackProcessCallback, void *);
 void jack_connect_ports(void);
 
 void jack_cleanup(void);

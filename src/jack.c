@@ -17,12 +17,12 @@ void jack_init_client(void)
 
 /* Sets up the callback (process callback, shutdown callbacks), creates an
  * input and output port and activates the client. Dies on any failure. */
-void jack_setup(JackProcessCallback callback)
+void jack_setup(JackProcessCallback callback, void *arg)
 {
 	if (!jack_state.client)
 		die("jack_setup: not connected to JACK, call jack_init_client first.\n");
 
-	int err = jack_set_process_callback(jack_state.client, callback, NULL);
+	int err = jack_set_process_callback(jack_state.client, callback, arg);
 	if (err)
 		die("jack_set_process_callback() failed, err = %d\n", err);
 
