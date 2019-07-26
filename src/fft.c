@@ -1,6 +1,7 @@
 #include <complex.h>
 #include <malloc.h>
 #include <math.h>
+#include <string.h>
 
 typedef complex double C;
 const double PI = 3.14159265358979323;
@@ -41,4 +42,23 @@ void fft(int n, double *v)
 	for (int i = 0; i < n; i++)
 		v[i] = cabs(com[i]);
 	free(com);
+}
+
+double fft_point(int n, double *v, double x)
+{
+	C om = cexp(2 * PI * I * x);
+	C ompow = 1;
+	C res = 0;
+	for (int i = 0; i < n; i++, ompow *= om)
+		res += v[i] * ompow;
+	return cabs(res);
+}
+
+void fft_slow(int n, double *v, int m, struct point *data)
+{
+	double logn = log(m + 1);
+	for (int i = 0; i < m; i++) {
+		double x = (exp((double)i * logn / (m + 1)) - 1) / (m + 1);
+		data[i] = (struct point){.x = log(x * m + 1) / log(m + 1), .y = fft_point(n, v, x * m / n) / m};
+	}
 }

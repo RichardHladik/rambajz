@@ -4,7 +4,6 @@
 #include <time.h>
 #include <unistd.h>
 #include "jack.h"
-#include "fft.c"
 #include "sdl.c"
 
 const size_t BUFSIZE = (1 << 20);
@@ -16,6 +15,12 @@ struct buf {
 	size_t size;
 };
 
+struct point {
+	double x;
+	double y;
+};
+#include "fft.c"
+
 int process(jack_nframes_t nframes, void *arg)
 {
 	struct buf *buf = arg;
@@ -24,9 +29,10 @@ int process(jack_nframes_t nframes, void *arg)
 	out = jack_port_get_buffer(jack_state.out_port, nframes);
 	int n = nframes;
 
+	size_t e = buf->e;
 	for (int i = 0; i < n; i++)
-		buf->data[(buf->e + i) % buf->size] = in[i];
-	buf->e = (buf->e + n) % buf->size;
+		buf->data[(e + i) % buf->size] = in[i];
+	buf->e = (e + n) % buf->size;
 
 	for (int i = 0; i < nframes; i++)
 		out[i] = 0;
@@ -34,7 +40,9 @@ int process(jack_nframes_t nframes, void *arg)
 	return 0;
 }
 
-bool draw(struct buf *buf)
+void draw(size_t n, struct point *data);
+
+bool analyze(struct buf *buf)
 {
 	SDL_Event ev;
 	while (SDL_PollEvent(&ev)) {
@@ -47,7 +55,9 @@ bool draw(struct buf *buf)
 		}
 	}
 
-	const int frame = (1 << 10);
+	static struct point *olddata = NULL;
+
+	const int frame = (1 << 12);
 	int e = buf->e;
 	int s = buf->s;
 	printf("%d %d\n", e, s);
@@ -55,41 +65,62 @@ bool draw(struct buf *buf)
 		return true;
 
 	int n = frame;
-	double v[n];
+	double *v = malloc(n * sizeof(*v));
+	double *v1 = malloc(n * sizeof(*v1));
 	s = (e + buf->size - frame) % buf->size;
 	buf->s = s;
 	for (int i = 0; i < n; i++)
-		v[i] = buf->data[(s + i) % buf->size];
+		v[i] = v1[i] = buf->data[(s + i) % buf->size];
 
+	int nn = (n + 1) / 2;
+	struct point *data = malloc(nn * sizeof(*data));
+	struct point *data1 = malloc(nn * sizeof(*data1));
 	fft(n, v);
-	for (int i = 0; i < n; i++)
-		v[i] /= n;
+	fft_slow(n, v1, nn, data1);
+	double logn = log(nn + 1);
+	for (int i = 0; i < nn; i++)
+		data[i] = (struct point){.x = (double)log(i + 1) / logn, .y = v[i] / n};
 
-	double m = 0;
-	n = n / 2 + 1;
-	for (int i = 0; i < n; i++)
-		if (fabs(v[i]) > m)
-			m = fabs(v[i]);
-	printf("%f ", m);
+	const double SMOOTHING = .5;
+	if (olddata)
+		for (int i = 0; i < nn; i++)
+			data1[i].y = data1[i].y * (1 - SMOOTHING) + olddata[i].y * SMOOTHING;
+
+	free(v);
+	free(v1);
 
 	SDL_Rect rect = {.h = sdl_state.h, .w = sdl_state.w, .x = 0, .y = 0};
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_state.ren);
+
+	SDL_SetRenderDrawColor(sdl_state.ren, 255, 0, 0, 255);
+	draw(nn, data);
 	SDL_SetRenderDrawColor(sdl_state.ren, 255, 255, 255, 255);
+	draw(nn, data1);
+	SDL_RenderPresent(sdl_state.ren);
+
+	free(olddata);
+	olddata = data1;
+	free(data);
+
+	return true;
+}
+
+void draw(size_t n, struct point *data)
+{
+	SDL_Rect rect;
+	double logn = log(n + 1);
 	for (int i = 0; i < n; i++) {
-		rect.h = sqrt(v[i]) * sdl_state.h; // (1 + v[i]) / 2 * sdl_state.h;
-		rect.y = 0;
-		rect.x = sdl_state.w * (long long)i / n;
-		rect.w = sdl_state.w * (long long)(i + 1) / n - rect.x;
-		if (!rect.w)
+		rect.h = sqrt(data[i].y) * sdl_state.h; // (1 + v[i]) / 2 * sdl_state.h;
+		rect.y = sdl_state.h - rect.h;
+		rect.x = sdl_state.w * ((i) ? data[i - 1].x : 0);
+		rect.w = sdl_state.w * data[i].x - rect.x;
+		if (rect.w <= 0)
 			rect.w = 1;
-//		SDL_FillRect(sdl_state.sur, &rect, SDL_MapRGB(sdl_state.sur->format, 255, 255, 255));
 		SDL_RenderFillRect(sdl_state.ren, &rect);
 	}
 
 	//SDL_Delay(100);
-	SDL_RenderPresent(sdl_state.ren);
-	return true;
 }
 
 int main(void)
@@ -101,6 +132,6 @@ int main(void)
 	jack_init_client();
 	jack_setup(process, &buf);
 	jack_connect_ports();
-	while (draw(&buf))
+	while (analyze(&buf))
 		;
 }
