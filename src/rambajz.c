@@ -9,18 +9,18 @@
 
 const size_t BUFSIZE = (1 << 20);
 
+// Assumption: nframes is constant throughout execution
 int record(jack_nframes_t nframes, void *arg)
 {
 	struct buffer *buf = arg;
 	jack_default_audio_sample_t *in, *out;
 	in = jack_port_get_buffer(jack_state.in_port, nframes);
 	out = jack_port_get_buffer(jack_state.out_port, nframes);
-	int n = nframes;
+	double in_double[nframes];
+	for (int i = 0; i < nframes; i++)
+		in_double[i] = in[i];
 
-	size_t e = buf->e;
-	for (int i = 0; i < n; i++)
-		buf->data[(e + i) % buf->size] = in[i];
-	buf->e = (e + n) % buf->size;
+	buffer_push(buf, in_double, nframes);
 
 	for (int i = 0; i < nframes; i++)
 		out[i] = 0;
