@@ -4,6 +4,9 @@
 #include "analyser.h"
 
 const int FRAME_SIZE = (1 << 12);
+static const double PI = 3.14159265358979323846;
+
+static void window_function(double *data, size_t n);
 
 struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf)
 {
@@ -15,6 +18,8 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf)
 		data = NULL;
 		goto finish;
 	}
+
+	window_function(v, n);
 
 	data->guessed_frequency = -1;
 	data->plot_size = (n + 1) / 2;
@@ -40,4 +45,18 @@ finish:
 void analysis_free(struct analysis_data data)
 {
 	free(data.plot);
+}
+
+// Assumes n doesn't change during a single run.
+static void window_function(double *data, size_t n)
+{
+	static double *window = NULL;
+	if (!window) {
+		window = malloc(n * sizeof(*window));
+		for (size_t i = 0; i < n; i++)
+			window[i] = sin(PI * i / n), window[i] *= window[i];
+	}
+
+	for (size_t i = 0; i < n; i++)
+		data[i] *= window[i];
 }
