@@ -7,7 +7,7 @@
 typedef complex double C;
 const double PI = 3.14159265358979323;
 
-void _fft(int n, C *v, int m, C *omega) {
+static void _fft(int n, C *v, int m, C *omega) {
     if (n == 1) return;
     C *even, *odd;
 	even = malloc(n * sizeof(*even));
@@ -45,7 +45,7 @@ void fft(int n, double *v)
 	free(com);
 }
 
-double fft_point(int n, double *v, double x)
+static double fft_point(int n, double *v, double x)
 {
 	C om = cexp(2 * PI * I * x);
 	C ompow = 1;
