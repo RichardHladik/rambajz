@@ -11,7 +11,7 @@ build/%.o: src/%.c build-dir
 	${COMPILE}
 
 build/rambajz: ${patsubst %,build/%,${objs}}
-	gcc $^ -o $@ ${LDFLAGS}
+	${C} $^ -o $@ ${LDFLAGS}
 
 all: build/rambajz
 
