@@ -53,19 +53,14 @@ void jack_connect_ports(void)
 	/* It's correct to assign all ports with JackPortsIs*Output* to *ins*,
 	 * because we take physical ports that *output* data as our *inputs*. */
 
-	if (!ins)
-		die("jack_connect_ports: JACK returned no physical input ports.\n");
-	if (!outs)
-		die("jack_connect_ports: JACK returned no physical output ports.\n");
-
-	for (const char **port = ins; *port; port++) {
+	for (const char **port = ins; port && *port; port++) {
 		int err = jack_connect(jack_state.client, *port,
 				jack_port_name(jack_state.in_port));
 		if (err)
 			die("jack_connect failed for port %s: err = %d\n", *port, err);
 	}
 
-	for (const char **port = outs; *port; port++) {
+	for (const char **port = outs; port && *port; port++) {
 		int err = jack_connect(jack_state.client,
 				jack_port_name(jack_state.out_port), *port);
 		if (err)
