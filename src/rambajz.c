@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include "jack.h"
 #include "sdl.c"
+#include "fft.h"
+#include "fft.c"
 
 const size_t BUFSIZE = (1 << 20);
 
@@ -14,12 +16,6 @@ struct buf {
 	_Atomic size_t e;
 	size_t size;
 };
-
-struct point {
-	double x;
-	double y;
-};
-#include "fft.c"
 
 int process(jack_nframes_t nframes, void *arg)
 {
