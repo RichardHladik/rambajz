@@ -47,18 +47,20 @@ bool process(struct buffer *buf)
 
 	const int frame = (1 << 12);
 	int e = buf->e;
-	int s = buf->s;
-	printf("%d %d\n", e, s);
-	if (e - s >= 0 && e - s < frame)
-		return true;
+	printf("%d\n", e);
 
 	int n = frame;
 	double *v = malloc(n * sizeof(*v));
 	double *v1 = malloc(n * sizeof(*v1));
-	s = (e + buf->size - frame) % buf->size;
-	buf->s = s;
-	for (int i = 0; i < n; i++)
-		v[i] = v1[i] = buf->data[(s + i) % buf->size];
+	if (!buffer_peek_back(buf, v, n)) {
+		free(v), free(v1);
+		return true;
+	}
+
+	if (!buffer_peek_back(buf, v1, n)) {
+		free(v), free(v1);
+		return true;
+	}
 
 	int nn = (n + 1) / 2;
 	struct point *data = malloc(nn * sizeof(*data));

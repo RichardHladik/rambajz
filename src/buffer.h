@@ -8,4 +8,5 @@ struct buffer {
 	size_t size; // Always a power of two
 };
 
-void buffer_push(struct buffer *buf, double *data, size_t n);
+void buffer_push(struct buffer *buf, const double *data, size_t n);
+double *buffer_peek_back(const struct buffer *buf, double *out, size_t n);
