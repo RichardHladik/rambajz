@@ -4,9 +4,8 @@
 #include <time.h>
 #include <unistd.h>
 #include "jack.h"
-#include "sdl.c"
+#include "sdl.h"
 #include "fft.h"
-#include "fft.c"
 
 const size_t BUFSIZE = (1 << 20);
 
