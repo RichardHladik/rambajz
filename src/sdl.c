@@ -1,13 +1,8 @@
+#include "sdl.h"
 #include "util.h"
-#include <SDL.h>
 
-struct {
-	SDL_Window *win;
-	SDL_Renderer *ren;
-	int w, h;
-} sdl_state;
-
-void sdl_init(void) {
+void sdl_init(void)
+{
 	sdl_state.w = 1024;
 	sdl_state.h = 768;
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -22,7 +17,8 @@ void sdl_init(void) {
 		die("sdl_init: SDL_CreateRenderer failed: %s\n", SDL_GetError());
 }
 
-void sdl_teardown(void) {
+void sdl_teardown(void)
+{
 	SDL_DestroyWindow(sdl_state.win);
 	SDL_Quit();
 }
