@@ -1,24 +1,17 @@
-#include <stdatomic.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+#include "buffer.h"
+#include "fft.h"
 #include "jack.h"
 #include "sdl.h"
-#include "fft.h"
 
 const size_t BUFSIZE = (1 << 20);
 
-struct buf {
-	double *data;
-	size_t s;
-	_Atomic size_t e;
-	size_t size;
-};
-
 int record(jack_nframes_t nframes, void *arg)
 {
-	struct buf *buf = arg;
+	struct buffer *buf = arg;
 	jack_default_audio_sample_t *in, *out;
 	in = jack_port_get_buffer(jack_state.in_port, nframes);
 	out = jack_port_get_buffer(jack_state.out_port, nframes);
@@ -37,7 +30,7 @@ int record(jack_nframes_t nframes, void *arg)
 
 void draw(size_t n, struct point *data);
 
-bool process(struct buf *buf)
+bool process(struct buffer *buf)
 {
 	SDL_Event ev;
 	while (SDL_PollEvent(&ev)) {
@@ -120,7 +113,7 @@ void draw(size_t n, struct point *data)
 
 int main(void)
 {
-	struct buf buf = {.s = 0, .e = 0, .size = BUFSIZE};
+	struct buffer buf = {.s = 0, .e = 0, .size = BUFSIZE};
 	buf.data = malloc(buf.size * sizeof(*buf.data));
 
 	sdl_init();
