@@ -55,8 +55,6 @@ bool process(struct buffer *buf)
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_state.ren);
 
-	SDL_SetRenderDrawColor(sdl_state.ren, 255, 0, 0, 255);
-	draw(data.plot_size, data.plot);
 	SDL_SetRenderDrawColor(sdl_state.ren, 255, 255, 255, 255);
 	draw(data.plot_size, data.plot);
 	SDL_RenderPresent(sdl_state.ren);
