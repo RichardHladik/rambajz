@@ -6,7 +6,7 @@
 /* Connects the client to the JACK server, dies on failure. */
 void jack_init_client(void)
 {
-	jack_options_t options = JackNoStartServer | JackUseExactName;
+	jack_options_t options = JackNoStartServer;
 	jack_status_t status;
 	jack_state.client = jack_client_open(JACK_CLIENT_NAME, options, &status, NULL);
 	if (!jack_state.client)
