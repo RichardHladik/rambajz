@@ -1,3 +1,6 @@
+#ifndef RAMBAJZ_BUFFER_H
+#define RAMBAJZ_BUFFER_H
+
 #include <stdatomic.h>
 #include <unistd.h>
 
@@ -10,3 +13,5 @@ struct buffer {
 
 void buffer_push(struct buffer *buf, const double *data, size_t n);
 double *buffer_peek_back(const struct buffer *buf, double *out, size_t n);
+
+#endif
