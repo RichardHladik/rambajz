@@ -57,10 +57,7 @@ bool process(struct buffer *buf)
 		return true;
 	}
 
-	if (!buffer_peek_back(buf, v1, n)) {
-		free(v), free(v1);
-		return true;
-	}
+	memcpy(v1, v, n * sizeof(*v1));
 
 	int nn = (n + 1) / 2;
 	struct point *data = malloc(nn * sizeof(*data));
