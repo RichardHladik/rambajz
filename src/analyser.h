@@ -3,7 +3,7 @@
 
 #include <unistd.h>
 #include "buffer.h"
-#include "fft.h"
+#include "fourier.h"
 
 struct analysis_data {
 	struct point *plot;

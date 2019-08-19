@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include "analyser.h"
 #include "buffer.h"
-#include "fft.h"
 #include "jack.h"
 #include "sdl.h"
 
