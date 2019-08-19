@@ -16,7 +16,7 @@ struct buf {
 	size_t size;
 };
 
-int process(jack_nframes_t nframes, void *arg)
+int record(jack_nframes_t nframes, void *arg)
 {
 	struct buf *buf = arg;
 	jack_default_audio_sample_t *in, *out;
@@ -37,7 +37,7 @@ int process(jack_nframes_t nframes, void *arg)
 
 void draw(size_t n, struct point *data);
 
-bool analyze(struct buf *buf)
+bool process(struct buf *buf)
 {
 	SDL_Event ev;
 	while (SDL_PollEvent(&ev)) {
@@ -125,8 +125,8 @@ int main(void)
 
 	sdl_init();
 	jack_init_client();
-	jack_setup(process, &buf);
+	jack_setup(record, &buf);
 	jack_connect_ports();
-	while (analyze(&buf))
+	while (process(&buf))
 		;
 }
