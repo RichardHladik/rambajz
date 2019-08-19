@@ -20,3 +20,4 @@ clean:
 
 .PHONY: all build-dir clean
 .DEFAULT_GOAL := all
+-include Makefile.local
