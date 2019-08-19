@@ -1,16 +1,18 @@
 C := gcc
 CFLAGS := -O2
-COMPILE = ${C} -std=c11 $(shell pkg-config --cflags sdl2) ${CFLAGS} $< -o $@ -c
 LDFLAGS := $(shell pkg-config --libs jack) $(shell pkg-config --libs sdl2) -lm
-objs := jack.o rambajz.o
+COMPILE = ${C} ${DEPFLAGS} -std=c11 $(shell pkg-config --cflags sdl2) ${CFLAGS} $< -o $@ -c
 
-build-dir:
-	mkdir -p build
+SRCS := jack.c rambajz.c
+OBJS := $(SRCS:%.c=%.o)
 
-build/%.o: src/%.c build-dir
+DEPFLAGS := -MD -MP
+
+build/%.o: src/%.c
+	@mkdir -p $(@D)
 	${COMPILE}
 
-build/rambajz: ${patsubst %,build/%,${objs}}
+build/rambajz: ${patsubst %,build/%,${OBJS}}
 	${C} $^ -o $@ ${LDFLAGS}
 
 all: build/rambajz
@@ -21,3 +23,4 @@ clean:
 .PHONY: all build-dir clean
 .DEFAULT_GOAL := all
 -include Makefile.local
+-include $(SRCS:%.c=build/%.d)
