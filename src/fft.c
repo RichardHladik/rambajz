@@ -1,8 +1,8 @@
+#include "fft.h"
 #include <complex.h>
 #include <malloc.h>
 #include <math.h>
 #include <string.h>
-#include "fft.h"
 
 typedef complex double C;
 const double PI = 3.14159265358979323;
