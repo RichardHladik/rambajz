@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>
+#include "analyser.h"
 #include "buffer.h"
 #include "fft.h"
 #include "jack.h"
@@ -43,53 +44,24 @@ bool process(struct buffer *buf)
 		}
 	}
 
-	static struct point *olddata = NULL;
-
-	const int frame = (1 << 12);
 	int e = buf->e;
 	printf("%d\n", e);
 
-	int n = frame;
-	double *v = malloc(n * sizeof(*v));
-	double *v1 = malloc(n * sizeof(*v1));
-	if (!buffer_peek_back(buf, v, n)) {
-		free(v), free(v1);
+	struct analysis_data data;
+	if (!analyse(&data, buf))
 		return true;
-	}
-
-	memcpy(v1, v, n * sizeof(*v1));
-
-	int nn = (n + 1) / 2;
-	struct point *data = malloc(nn * sizeof(*data));
-	struct point *data1 = malloc(nn * sizeof(*data1));
-	fft(n, v);
-	fft_slow(n, v1, nn, data1);
-	double logn = log(nn + 1);
-	for (int i = 0; i < nn; i++)
-		data[i] = (struct point){.x = (double)log(i + 1) / logn, .y = v[i] / n};
-
-	const double SMOOTHING = .5;
-	if (olddata)
-		for (int i = 0; i < nn; i++)
-			data1[i].y = data1[i].y * (1 - SMOOTHING) + olddata[i].y * SMOOTHING;
-
-	free(v);
-	free(v1);
 
 	SDL_Rect rect = {.h = sdl_state.h, .w = sdl_state.w, .x = 0, .y = 0};
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_state.ren);
 
 	SDL_SetRenderDrawColor(sdl_state.ren, 255, 0, 0, 255);
-	draw(nn, data);
+	draw(data.plot_size, data.plot);
 	SDL_SetRenderDrawColor(sdl_state.ren, 255, 255, 255, 255);
-	draw(nn, data1);
+	draw(data.plot_size, data.plot);
 	SDL_RenderPresent(sdl_state.ren);
 
-	free(olddata);
-	olddata = data1;
-	free(data);
-
+	analysis_free(data);
 	return true;
 }
 
