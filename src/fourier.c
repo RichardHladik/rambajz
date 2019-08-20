@@ -61,12 +61,10 @@ double frequency_strength(int n, double *v, double freq)
 	return fourier_point(n, v, freq / jack_state.sample_rate);
 }
 
-void plot_frequencies(int n, double *v, int m, struct point *data)
+void plot_frequencies(int n, double *v, int m, struct point *data, double A, double B)
 {
-	const double low = 0;
-	const double high = jack_state.sample_rate / 2;
 	for (size_t i = 0; i < m; i++) {
-		double freq = low + (high - low) * ((double)i / (m - 1));
+		double freq = A + (B - A) * ((double)i / (m - 1));
 		data[i] = (struct point){.x = freq, .y = frequency_strength(n, v, freq) / m};
 	}
 }

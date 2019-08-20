@@ -11,7 +11,12 @@ struct analysis_data {
 	double guessed_frequency;
 };
 
-struct analysis_data *analyse(struct analysis_data *, struct buffer *);
+struct analysis_params {
+	double min_freq;
+	double max_freq;
+};
+
+struct analysis_data *analyse(struct analysis_data *, struct buffer *, const struct analysis_params *);
 void analysis_free(struct analysis_data data);
 
 #endif

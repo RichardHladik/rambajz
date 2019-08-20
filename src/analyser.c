@@ -8,7 +8,7 @@ static const double PI = 3.14159265358979323846;
 
 static void window_function(double *data, size_t n);
 
-struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf)
+struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, const struct analysis_params *params)
 {
 	static struct point *oldplot = NULL;
 
@@ -25,7 +25,7 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf)
 	data->plot_size = (n + 1) / 2;
 	data->plot = malloc(data->plot_size * sizeof(*data->plot));
 
-	plot_frequencies(n, v, data->plot_size, data->plot);
+	plot_frequencies(n, v, data->plot_size, data->plot, params->min_freq, params->max_freq);
 
 	const double SMOOTHING = .5;
 	if (!oldplot) {

@@ -32,6 +32,14 @@ void draw(size_t n, struct point *data);
 
 bool process(struct buffer *buf)
 {
+	const double min_freq = 10;
+	const double max_freq = jack_state.sample_rate / 2;
+	static struct analysis_params params = {0};
+	if (params.min_freq == 0) {
+		params.min_freq = min_freq;
+		params.max_freq = max_freq;
+	}
+
 	SDL_Event ev;
 	while (SDL_PollEvent(&ev)) {
 		if (ev.type == SDL_QUIT)
@@ -47,13 +55,11 @@ bool process(struct buffer *buf)
 	printf("%d\n", e);
 
 	struct analysis_data data;
-	if (!analyse(&data, buf))
+	if (!analyse(&data, buf, &params))
 		return true;
 
-	double freqA = 10;
-	double freqB = jack_state.sample_rate;
 	for (int i = 0; i < data.plot_size; i++)
-		data.plot[i].x = log(data.plot[i].x / freqA) / log(freqB / freqA);
+		data.plot[i].x = log(data.plot[i].x / params.min_freq) / log(params.max_freq / params.min_freq);
 
 	SDL_Rect rect = {.h = sdl_state.h, .w = sdl_state.w, .x = 0, .y = 0};
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 0, 0, 255);
