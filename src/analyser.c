@@ -25,8 +25,8 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf)
 	data->plot_size = (n + 1) / 2;
 	data->plot = malloc(data->plot_size * sizeof(*data->plot));
 
-	// for now, assume fft_slow returns the "same" plot every time (only with different y values)
-	fft_slow(n, v, data->plot_size, data->plot);
+	plot_frequencies(n, v, data->plot_size, data->plot);
+
 	const double SMOOTHING = .5;
 	if (!oldplot) {
 		oldplot = malloc(data->plot_size * sizeof(*data->plot));

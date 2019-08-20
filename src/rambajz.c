@@ -50,6 +50,11 @@ bool process(struct buffer *buf)
 	if (!analyse(&data, buf))
 		return true;
 
+	double freqA = 10;
+	double freqB = jack_state.sample_rate;
+	for (int i = 0; i < data.plot_size; i++)
+		data.plot[i].x = log(data.plot[i].x / freqA) / log(freqB / freqA);
+
 	SDL_Rect rect = {.h = sdl_state.h, .w = sdl_state.w, .x = 0, .y = 0};
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_state.ren);

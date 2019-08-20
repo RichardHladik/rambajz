@@ -3,6 +3,7 @@
 #include <malloc.h>
 #include <math.h>
 #include <string.h>
+#include "jack.h"
 
 typedef complex double C;
 const double PI = 3.14159265358979323;
@@ -45,7 +46,7 @@ void fft(int n, double *v)
 	free(com);
 }
 
-static double fft_point(int n, double *v, double x)
+static double fourier_point(int n, double *v, double x)
 {
 	C om = cexp(2 * PI * I * x);
 	C ompow = 1;
@@ -55,11 +56,17 @@ static double fft_point(int n, double *v, double x)
 	return cabs(res);
 }
 
-void fft_slow(int n, double *v, int m, struct point *data)
+double frequency_strength(int n, double *v, double freq)
 {
-	double logn = log(m + 1);
-	for (int i = 0; i < m; i++) {
-		double x = (exp((double)i * logn / (m + 1)) - 1) / (m + 1);
-		data[i] = (struct point){.x = log(x * m + 1) / log(m + 1), .y = fft_point(n, v, x * m / n) / m};
+	return fourier_point(n, v, freq / jack_state.sample_rate);
+}
+
+void plot_frequencies(int n, double *v, int m, struct point *data)
+{
+	const double low = 0;
+	const double high = jack_state.sample_rate / 2;
+	for (size_t i = 0; i < m; i++) {
+		double freq = low + (high - low) * ((double)i / (m - 1));
+		data[i] = (struct point){.x = freq, .y = frequency_strength(n, v, freq) / m};
 	}
 }
