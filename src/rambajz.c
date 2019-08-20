@@ -68,9 +68,8 @@ void draw(size_t n, struct point *data)
 		data[i].x = fmin(1, fmax(0, data[i].x));
 
 	SDL_Rect rect;
-	double logn = log(n + 1);
 	for (int i = 0; i < n; i++) {
-		rect.h = sqrt(data[i].y) * sdl_state.h; // (1 + v[i]) / 2 * sdl_state.h;
+		rect.h = sqrt(data[i].y) * sdl_state.h;
 		rect.y = sdl_state.h - rect.h;
 		rect.x = sdl_state.w * ((i) ? data[i - 1].x : 0);
 		rect.w = sdl_state.w * data[i].x - rect.x;
