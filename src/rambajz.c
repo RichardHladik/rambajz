@@ -64,6 +64,9 @@ bool process(struct buffer *buf)
 
 void draw(size_t n, struct point *data)
 {
+	for (size_t i = 0; i < n; i++)
+		data[i].x = fmin(1, fmax(0, data[i].x));
+
 	SDL_Rect rect;
 	double logn = log(n + 1);
 	for (int i = 0; i < n; i++) {
