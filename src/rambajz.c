@@ -49,6 +49,33 @@ bool process(struct buffer *buf)
 			if (ev.window.event == SDL_WINDOWEVENT_RESIZED || ev.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 				sdl_state.w = ev.window.data1, sdl_state.h = ev.window.data2;
 		}
+
+		if (ev.type == SDL_KEYDOWN) {
+			static const double zoom = 2;
+			static const double shift = 1/4.;
+			double center = (params.min_freq + params.max_freq) / 2;
+			double width = params.max_freq - params.min_freq;
+			SDL_Scancode key = ev.key.keysym.scancode;
+			switch (key) {
+			case SDL_SCANCODE_J:
+				width /= zoom;
+				break;
+			case SDL_SCANCODE_K:
+				width *= zoom;
+				break;
+			case SDL_SCANCODE_H:
+				center -= width * shift;
+				break;
+			case SDL_SCANCODE_L:
+				center += width * shift;
+				break;
+			default:
+				break;
+			}
+
+			params.min_freq = center - width / 2;
+			params.max_freq = center + width / 2;
+		}
 	}
 
 	int e = buf->e;
