@@ -54,8 +54,10 @@ bool process(struct buffer *buf)
 		if (ev.type == SDL_KEYDOWN) {
 			static const double zoom = 2;
 			static const double shift = 1/4.;
-			double center = (params.min_freq + params.max_freq) / 2;
-			double width = params.max_freq - params.min_freq;
+			double A = logscale(params.min_freq, min_freq, max_freq);
+			double B = logscale(params.max_freq, min_freq, max_freq);
+			double center = (A + B) / 2;
+			double width = B - A;
 			SDL_Scancode key = ev.key.keysym.scancode;
 			switch (key) {
 			case SDL_SCANCODE_J:
@@ -74,8 +76,10 @@ bool process(struct buffer *buf)
 				break;
 			}
 
-			params.min_freq = center - width / 2;
-			params.max_freq = center + width / 2;
+			A = center - width / 2;
+			B = center + width / 2;
+			params.min_freq = inv_logscale(A, min_freq, max_freq);
+			params.max_freq = inv_logscale(B, min_freq, max_freq);
 		}
 	}
 
