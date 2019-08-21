@@ -33,7 +33,7 @@ void draw(size_t n, struct point *data);
 
 bool process(struct buffer *buf)
 {
-	const double min_freq = 10;
+	const double min_freq = 20;
 	const double max_freq = jack_state.sample_rate / 2;
 	static struct analysis_params params = {0};
 	if (params.min_freq == 0) {
