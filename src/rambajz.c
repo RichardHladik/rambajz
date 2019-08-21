@@ -6,6 +6,7 @@
 #include "buffer.h"
 #include "jack.h"
 #include "sdl.h"
+#include "util.h"
 
 const size_t BUFSIZE = (1 << 20);
 
@@ -86,7 +87,7 @@ bool process(struct buffer *buf)
 		return true;
 
 	for (int i = 0; i < data.plot_size; i++)
-		data.plot[i].x = log(data.plot[i].x / params.min_freq) / log(params.max_freq / params.min_freq);
+		data.plot[i].x = logscale(data.plot[i].x, params.min_freq, params.max_freq);
 
 	SDL_Rect rect = {.h = sdl_state.h, .w = sdl_state.w, .x = 0, .y = 0};
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 0, 0, 255);
