@@ -3,7 +3,7 @@
 #include <memory.h>
 #include "analyser.h"
 
-const int FRAME_SIZE = (1 << 12);
+const int FRAME_SIZE = (1 << 13);
 static const double PI = 3.14159265358979323846;
 
 static void window_function(double *data, size_t n);
@@ -22,7 +22,7 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	window_function(v, n);
 
 	data->guessed_frequency = -1;
-	data->plot_size = (n + 1) / 2;
+	data->plot_size = (1 << 23) / n;
 	data->plot = malloc(data->plot_size * sizeof(*data->plot));
 
 	plot_frequencies(n, v, data->plot_size, data->plot, params->min_freq, params->max_freq);
