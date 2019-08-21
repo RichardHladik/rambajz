@@ -3,6 +3,7 @@
 #include <malloc.h>
 #include <math.h>
 #include <string.h>
+#include "util.h"
 #include "jack.h"
 
 typedef complex double C;
@@ -64,7 +65,7 @@ double frequency_strength(int n, double *v, double freq)
 void plot_frequencies(int n, double *v, int m, struct point *data, double A, double B)
 {
 	for (size_t i = 0; i < m; i++) {
-		double freq = A + (B - A) * ((double)i / (m - 1));
+		double freq = inv_logscale((double)i / (m - 1), A, B);
 		data[i] = (struct point){.x = freq, .y = frequency_strength(n, v, freq) / m};
 	}
 }
