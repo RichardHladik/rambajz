@@ -51,7 +51,7 @@ bool process(struct buffer *buf)
 				sdl_state.w = ev.window.data1, sdl_state.h = ev.window.data2;
 		}
 
-		if (ev.type == SDL_KEYDOWN) {
+		if (0 && ev.type == SDL_KEYDOWN) {
 			static const double zoom = 2;
 			static const double shift = 1/4.;
 			double A = logscale(params.min_freq, min_freq, max_freq);
