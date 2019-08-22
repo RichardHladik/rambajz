@@ -100,13 +100,11 @@ bool process(struct buffer *buf)
 	params.min_freq = exp(viewport.A);
 	params.max_freq = exp(viewport.B);
 
-	int e = buf->e;
-	printf("%d\n", e);
-
 	struct analysis_data data;
 	if (!analyse(&data, buf, &params))
 		return true;
 
+	printf("%lf\n", data.guessed_frequency);
 	draw(&data, &params);
 
 	analysis_free(data);
@@ -135,6 +133,9 @@ void draw(const struct analysis_data *data, const struct analysis_params *params
 
 	SDL_SetRenderDrawColor(sdl_state.ren, 255, 255, 255, 255);
 	draw_plot(data->plot_size, data->plot, params->min_freq, params->max_freq);
+	SDL_SetRenderDrawColor(sdl_state.ren, 255, 0, 0, 255);
+	double guessed = logscale(data->guessed_frequency, params->min_freq, params->max_freq);
+	plot_interval(guessed, guessed, 1);
 	SDL_RenderPresent(sdl_state.ren);
 }
 
