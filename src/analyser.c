@@ -19,7 +19,7 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 
 	window_function(v, n);
 
-	data->guessed_frequency = -1;
+	data->guessed_frequency = NAN;
 	data->plot_size = (1 << 23) / n;
 	data->plot = malloc(data->plot_size * sizeof(*data->plot));
 
@@ -41,6 +41,11 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 
 	old.params = *params;
 	memcpy(old.plot, data->plot, data->plot_size * sizeof(*data->plot));
+
+	double best = 0;
+	for (size_t i = 0; i < data->plot_size; i++)
+		if (data->plot[i].y > best)
+			best = data->plot[i].y, data->guessed_frequency = data->plot[i].x;
 
 finish:
 	free(v);
