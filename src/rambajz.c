@@ -82,7 +82,7 @@ bool process(struct buffer *buf)
 		}
 
 		if (ev.type == SDL_MOUSEWHEEL) {
-			static const double xf = 1/8.;
+			static const double xf = 1/32.;
 			static const double yf = 1/8.;
 			double x = -ev.wheel.x * xf;
 			double y = -ev.wheel.y * yf;
