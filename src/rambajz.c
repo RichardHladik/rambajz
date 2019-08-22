@@ -36,13 +36,13 @@ bool process(struct buffer *buf)
 	const double min_freq = 20;
 	const double max_freq = jack_state.sample_rate / 2;
 	struct analysis_params params = {0};
-	static struct {
+	static struct viewport_t {
 		double A;
 		double B;
-	} viewport = {NAN, NAN};
+	} viewport = {NAN, NAN}, limits = {NAN, NAN};
 	if (isnan(viewport.A)) {
-		viewport.A = log(min_freq);
-		viewport.B = log(max_freq);
+		limits.A = viewport.A = log(min_freq);
+		limits.B = viewport.B = log(max_freq);
 	}
 
 	SDL_Event ev;
@@ -57,11 +57,11 @@ bool process(struct buffer *buf)
 
 		const int blacklist = KMOD_MODE | KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI;
 		const int modstate = SDL_GetModState(); // FIXME: Hack
+		double center = (viewport.A + viewport.B) / 2;
+		double width = viewport.B - viewport.A;
 		if (ev.type == SDL_KEYDOWN && (modstate & blacklist) == 0) {
 			static const double zoom = 2;
 			static const double shift = 1/4.;
-			double center = (viewport.A + viewport.B) / 2;
-			double width = viewport.B - viewport.A;
 			SDL_Scancode key = ev.key.keysym.scancode;
 			switch (key) {
 			case SDL_SCANCODE_J:
@@ -79,11 +79,21 @@ bool process(struct buffer *buf)
 			default:
 				break;
 			}
-
-			center = fmin(center, log(max_freq) - width / 2);
-			viewport.A = center - width / 2;
-			viewport.B = center + width / 2;
 		}
+
+		if (ev.type == SDL_MOUSEWHEEL) {
+			static const double xf = 1/8.;
+			static const double yf = 1/8.;
+			double x = -ev.wheel.x * xf;
+			double y = -ev.wheel.y * yf;
+			center += width * x;
+			width *= exp(y);
+		}
+
+		width = fmin(width, limits.B - limits.A);
+		center = fmax(fmin(center, limits.B - width / 2), limits.A + width / 2);
+		viewport.A = center - width / 2;
+		viewport.B = center + width / 2;
 	}
 
 	params.min_freq = exp(viewport.A);
