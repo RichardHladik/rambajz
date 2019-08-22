@@ -7,6 +7,15 @@ const int FRAME_SIZE = (1 << 13);
 static const double PI = 3.14159265358979323846;
 
 static void window_function(double *data, size_t n);
+static double estimate_frequency(const struct analysis_data *data);
+
+static size_t argmax(const struct point *plot, size_t size) {
+	size_t res = 0;
+	for (size_t i = 0; i < size; i++)
+		if (plot[i].y > plot[res].y)
+			res = i;
+	return res;
+}
 
 struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, const struct analysis_params *params)
 {
@@ -42,10 +51,7 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	old.params = *params;
 	memcpy(old.plot, data->plot, data->plot_size * sizeof(*data->plot));
 
-	double best = 0;
-	for (size_t i = 0; i < data->plot_size; i++)
-		if (data->plot[i].y > best)
-			best = data->plot[i].y, data->guessed_frequency = data->plot[i].x;
+	data->guessed_frequency = data->plot[argmax(data->plot, data->plot_size)].x;
 
 finish:
 	free(v);
