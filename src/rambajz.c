@@ -55,7 +55,9 @@ bool process(struct buffer *buf)
 				sdl_state.w = ev.window.data1, sdl_state.h = ev.window.data2;
 		}
 
-		if (ev.type == SDL_KEYDOWN) {
+		const int blacklist = KMOD_MODE | KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI;
+		const int modstate = SDL_GetModState(); // FIXME: Hack
+		if (ev.type == SDL_KEYDOWN && (modstate & blacklist) == 0) {
 			static const double zoom = 2;
 			static const double shift = 1/4.;
 			double center = (viewport.A + viewport.B) / 2;
