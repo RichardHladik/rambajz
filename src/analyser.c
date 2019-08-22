@@ -10,8 +10,6 @@ static void window_function(double *data, size_t n);
 
 struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, const struct analysis_params *params)
 {
-	static struct point *oldplot = NULL;
-
 	const size_t n = FRAME_SIZE;
 	double *v = malloc(n * sizeof(*v));
 	if (!buffer_peek_back(buf, v, n)) {
@@ -28,14 +26,21 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	plot_frequencies(n, v, data->plot_size, data->plot, params->min_freq, params->max_freq);
 
 	const double SMOOTHING = .5;
-	if (!oldplot) {
-		oldplot = malloc(data->plot_size * sizeof(*data->plot));
-	} else {
+
+	static struct {
+		struct point *plot;
+		struct analysis_params params;
+	} old = {NULL, {0}};
+
+	if (!old.plot) {
+		old.plot = malloc(data->plot_size * sizeof(*data->plot));
+	} else if (params->max_freq == old.params.max_freq && params->min_freq == old.params.min_freq) {
 		for (int i = 0; i < data->plot_size; i++)
-			data->plot[i].y = data->plot[i].y * (1 - SMOOTHING) + oldplot[i].y * SMOOTHING;
+			data->plot[i].y = data->plot[i].y * (1 - SMOOTHING) + old.plot[i].y * SMOOTHING;
 	}
 
-	memcpy(oldplot, data->plot, data->plot_size * sizeof(*data->plot));
+	old.params = *params;
+	memcpy(old.plot, data->plot, data->plot_size * sizeof(*data->plot));
 
 finish:
 	free(v);
