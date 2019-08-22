@@ -29,8 +29,8 @@ int record(jack_nframes_t nframes, void *arg)
 	return 0;
 }
 
-void draw(struct analysis_data *);
-void draw_plot(size_t n, struct point *data);
+void draw(const struct analysis_data *, const struct analysis_params *);
+void draw_plot(size_t n, const struct point *data, double from, double to);
 
 bool process(struct buffer *buf)
 {
@@ -107,11 +107,7 @@ bool process(struct buffer *buf)
 	if (!analyse(&data, buf, &params))
 		return true;
 
-	for (int i = 0; i < data.plot_size; i++)
-		data.plot[i].x = logscale(data.plot[i].x, params.min_freq, params.max_freq);
-	data.guessed_frequency = logscale(data.guessed_frequency, params.min_freq, params.max_freq);
-
-	draw(&data);
+	draw(&data, &params);
 
 	analysis_free(data);
 	return true;
@@ -132,23 +128,23 @@ void plot_interval(double x0, double x1, double y) {
 	SDL_RenderFillRect(sdl_state.ren, &rect);
 }
 
-void draw(struct analysis_data *data) {
+void draw(const struct analysis_data *data, const struct analysis_params *params) {
 	SDL_Rect rect = {.h = sdl_state.h, .w = sdl_state.w, .x = 0, .y = 0};
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_state.ren);
 
 	SDL_SetRenderDrawColor(sdl_state.ren, 255, 255, 255, 255);
-	draw_plot(data->plot_size, data->plot);
+	draw_plot(data->plot_size, data->plot, params->min_freq, params->max_freq);
 	SDL_RenderPresent(sdl_state.ren);
 }
 
-void draw_plot(size_t n, struct point *data)
+void draw_plot(size_t n, const struct point *data, double A, double B)
 {
 	for (int i = 0; i < n; i++) {
 		double x0 = (i) ? data[i - 1].x : 0;
 		double x1 = data[i].x;
 		double y = sqrt(data[i].y);
-		plot_interval(x0, x1, y);
+		plot_interval(logscale(x0, A, B), logscale(x1, A, B), y);
 	}
 }
 
