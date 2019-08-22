@@ -35,10 +35,14 @@ bool process(struct buffer *buf)
 {
 	const double min_freq = 20;
 	const double max_freq = jack_state.sample_rate / 2;
-	static struct analysis_params params = {0};
-	if (params.min_freq == 0) {
-		params.min_freq = min_freq;
-		params.max_freq = max_freq;
+	struct analysis_params params = {0};
+	static struct {
+		double A;
+		double B;
+	} viewport = {NAN, NAN};
+	if (isnan(viewport.A)) {
+		viewport.A = log(min_freq);
+		viewport.B = log(max_freq);
 	}
 
 	SDL_Event ev;
@@ -51,13 +55,11 @@ bool process(struct buffer *buf)
 				sdl_state.w = ev.window.data1, sdl_state.h = ev.window.data2;
 		}
 
-		if (0 && ev.type == SDL_KEYDOWN) {
+		if (ev.type == SDL_KEYDOWN) {
 			static const double zoom = 2;
 			static const double shift = 1/4.;
-			double A = logscale(params.min_freq, min_freq, max_freq);
-			double B = logscale(params.max_freq, min_freq, max_freq);
-			double center = (A + B) / 2;
-			double width = B - A;
+			double center = (viewport.A + viewport.B) / 2;
+			double width = viewport.B - viewport.A;
 			SDL_Scancode key = ev.key.keysym.scancode;
 			switch (key) {
 			case SDL_SCANCODE_J:
@@ -76,12 +78,14 @@ bool process(struct buffer *buf)
 				break;
 			}
 
-			A = center - width / 2;
-			B = center + width / 2;
-			params.min_freq = inv_logscale(A, min_freq, max_freq);
-			params.max_freq = inv_logscale(B, min_freq, max_freq);
+			center = fmin(center, log(max_freq) - width / 2);
+			viewport.A = center - width / 2;
+			viewport.B = center + width / 2;
 		}
 	}
+
+	params.min_freq = exp(viewport.A);
+	params.max_freq = exp(viewport.B);
 
 	int e = buf->e;
 	printf("%d\n", e);
