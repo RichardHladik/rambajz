@@ -16,7 +16,7 @@ static void die(const char fmt[], ...)
 }
 
 inline double logscale(double x, double from, double to) {
-	return log(x / from) / log(to / from);
+	return (log(x) - log(from)) / (log(to) - log(from));
 }
 
 inline double inv_logscale(double x, double from, double to) {
