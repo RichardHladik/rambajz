@@ -9,14 +9,20 @@ const int PLOT_SIZE = OPERATIONS / FRAME_SIZE;
 static const double PI = 3.14159265358979323846;
 
 static void window_function(double *data, size_t n);
-static double estimate_frequency(const struct analysis_data *data);
+static double estimate_frequency(double *samples, size_t n, const struct analysis_params *params);
 
-static size_t argmax(const struct point *plot, size_t size) {
+static size_t argmax(const struct point *plot, size_t size)
+{
 	size_t res = 0;
 	for (size_t i = 0; i < size; i++)
 		if (plot[i].y > plot[res].y)
 			res = i;
 	return res;
+}
+
+static double top_frequency(const struct point *plot, size_t size)
+{
+	return plot[argmax(plot, size)].x;
 }
 
 struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, const struct analysis_params *params)
@@ -53,11 +59,32 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	old.params = *params;
 	memcpy(old.plot, data->plot, data->plot_size * sizeof(*data->plot));
 
-	data->guessed_frequency = data->plot[argmax(data->plot, data->plot_size)].x;
+	data->guessed_frequency = estimate_frequency(v, n, params);
 
 finish:
 	free(v);
 	return data;
+}
+
+static double estimate_frequency(double *samples, size_t n, const struct analysis_params *params)
+{
+	size_t size = PLOT_SIZE;
+	double low = params->min_freq, high = params->max_freq;
+	struct point *plot = malloc(size * sizeof(*plot));
+	for (size_t it = 0; it < 10; it++) {
+		printf("[%lf %lf]", low, high);
+		plot_frequencies(n, samples, size, plot, low, high);
+		double guess = top_frequency(plot, size);
+		double width = (high - low) * .1;
+		low = fmax(guess - width / 2, low);
+		high = fmin(guess + width / 2, high);
+		size /= 2;
+	}
+	printf("\n");
+
+	free(plot);
+
+	return (low + high) / 2;
 }
 
 void analysis_free(struct analysis_data data)
