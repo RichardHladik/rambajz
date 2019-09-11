@@ -4,12 +4,10 @@
 #include "analyser.h"
 
 const int FRAME_SIZE = 1 << 14;
-const int OPERATIONS = (1 << 23);
-const int PLOT_SIZE = OPERATIONS / FRAME_SIZE;
 static const double PI = 3.14159265358979323846;
 
 static void window_function(double *data, size_t n);
-static double estimate_frequency(double *samples, size_t n, const struct analysis_params *params);
+static double estimate_frequency(double *v, size_t n, double mean, double radius);
 
 static size_t argmax(const struct point *plot, size_t size)
 {
@@ -58,32 +56,35 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	old.params = *params;
 	memcpy(old.plot, data->plot, data->plot_size * sizeof(*data->plot));
 
-//	data->guessed_frequency = estimate_frequency(v, n, params);
+	double guess = top_frequency(data->plot, data->plot_size);
+	data->guessed_frequency = estimate_frequency(v, n, guess, 10);
 
 finish:
 	free(v);
 	return data;
 }
 
-static double estimate_frequency(double *samples, size_t n, const struct analysis_params *params)
+static double estimate_frequency(double *v, size_t n, double mean, double radius)
 {
-	size_t size = PLOT_SIZE;
-	double low = params->min_freq, high = params->max_freq;
-	struct point *plot = malloc(size * sizeof(*plot));
-	for (size_t it = 0; it < 10; it++) {
-		printf("[%lf %lf]", low, high);
-		plot_frequencies_logscale(n, samples, size, plot, low, high);
-		double guess = top_frequency(plot, size);
-		double width = (high - low) * .1;
-		low = fmax(guess - width / 2, low);
-		high = fmin(guess + width / 2, high);
-		size /= 2;
+	static const double start_resolution = 10; // Hz
+	static const double target_resolution = 1e-6;
+	static const double step = 4;
+	for (double res = start_resolution; res > target_resolution; res /= step) {
+		double low = mean - radius, high = mean + radius;
+		size_t cnt = (high - low) / res + 2;
+		double best = mean, bestval = frequency_strength(n, v, mean);
+		for (size_t i = 0; i < cnt; i++) {
+			double freq = low + (high - low) * i / cnt;
+			double strength = frequency_strength(n, v, freq);
+			if (strength > bestval)
+				best = freq, bestval = strength;
+		}
+
+		radius = 2 * res;
+		mean = best;
 	}
-	printf("\n");
 
-	free(plot);
-
-	return (low + high) / 2;
+	return mean;
 }
 
 void analysis_free(struct analysis_data data)
