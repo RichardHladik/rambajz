@@ -3,7 +3,7 @@
 #include <memory.h>
 #include "analyser.h"
 
-const int FRAME_SIZE = (1 << 13);
+const int FRAME_SIZE = 1 << 14;
 const int OPERATIONS = (1 << 23);
 const int PLOT_SIZE = OPERATIONS / FRAME_SIZE;
 static const double PI = 3.14159265358979323846;
@@ -37,12 +37,11 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	window_function(v, n);
 
 	data->guessed_frequency = NAN;
-	data->plot_size = PLOT_SIZE;
+	data->plot_size = n / 2;
 	data->plot = malloc(data->plot_size * sizeof(*data->plot));
+	plot_frequencies(n, v, data->plot);
 
-	plot_frequencies_logscale(n, v, data->plot_size, data->plot, params->min_freq, params->max_freq);
-
-	const double SMOOTHING = .5;
+	const double SMOOTHING = 0;
 
 	static struct {
 		struct point *plot;
@@ -59,7 +58,7 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	old.params = *params;
 	memcpy(old.plot, data->plot, data->plot_size * sizeof(*data->plot));
 
-	data->guessed_frequency = estimate_frequency(v, n, params);
+//	data->guessed_frequency = estimate_frequency(v, n, params);
 
 finish:
 	free(v);
