@@ -1,12 +1,10 @@
 #include "fourier.h"
-#include <complex.h>
 #include <malloc.h>
 #include <math.h>
 #include <string.h>
 #include "util.h"
 #include "jack.h"
 
-typedef complex double C;
 const double PI = 3.14159265358979323;
 
 static void _fft(int n, C *v, int m, C *omega) {
@@ -28,7 +26,7 @@ static void _fft(int n, C *v, int m, C *omega) {
 	free(even);
 }
 
-void fft(int n, double *v)
+void fft(int n, C *v)
 {
 	C *omega = malloc(n * sizeof(*omega));
 	omega[0] = 1;
@@ -36,15 +34,8 @@ void fft(int n, double *v)
 	for (int i = 2; i < n; i++)
 		omega[i] = omega[i - 1] * omega[1];
 
-	C *com = malloc(n * sizeof(*com));
-	for (int i = 0; i < n; i++)
-		com[i] = v[i];
-
-	_fft(n, com, n, omega);
+	_fft(n, v, n, omega);
 	free(omega);
-	for (int i = 0; i < n; i++)
-		v[i] = cabs(com[i]);
-	free(com);
 }
 
 static double fourier_point(int n, double *v, double x)
