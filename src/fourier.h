@@ -9,6 +9,7 @@ struct point {
 };
 
 void fft(int n, C *v);
+double frequency_strength(int n, double *v, double freq);
 void plot_frequencies_logscale(int n, double *v, int m, struct point *data, double min_freq, double max_freq);
 
 #endif
