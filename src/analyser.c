@@ -39,19 +39,13 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	data->plot = malloc(data->plot_size * sizeof(*data->plot));
 	plot_frequencies(n, v, data->plot);
 
-	const double SMOOTHING = 0;
-
 	static struct {
 		struct point *plot;
 		struct analysis_params params;
 	} old = {NULL, {0}};
 
-	if (!old.plot) {
+	if (!old.plot)
 		old.plot = malloc(data->plot_size * sizeof(*data->plot));
-	} else if (params->max_freq == old.params.max_freq && params->min_freq == old.params.min_freq) {
-		for (int i = 0; i < data->plot_size; i++)
-			data->plot[i].y = data->plot[i].y * (1 - SMOOTHING) + old.plot[i].y * SMOOTHING;
-	}
 
 	old.params = *params;
 	memcpy(old.plot, data->plot, data->plot_size * sizeof(*data->plot));
