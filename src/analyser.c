@@ -40,7 +40,7 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	data->plot_size = PLOT_SIZE;
 	data->plot = malloc(data->plot_size * sizeof(*data->plot));
 
-	plot_frequencies(n, v, data->plot_size, data->plot, params->min_freq, params->max_freq);
+	plot_frequencies_logscale(n, v, data->plot_size, data->plot, params->min_freq, params->max_freq);
 
 	const double SMOOTHING = .5;
 
@@ -73,7 +73,7 @@ static double estimate_frequency(double *samples, size_t n, const struct analysi
 	struct point *plot = malloc(size * sizeof(*plot));
 	for (size_t it = 0; it < 10; it++) {
 		printf("[%lf %lf]", low, high);
-		plot_frequencies(n, samples, size, plot, low, high);
+		plot_frequencies_logscale(n, samples, size, plot, low, high);
 		double guess = top_frequency(plot, size);
 		double width = (high - low) * .1;
 		low = fmax(guess - width / 2, low);

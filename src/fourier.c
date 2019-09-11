@@ -53,7 +53,7 @@ double frequency_strength(int n, double *v, double freq)
 	return fourier_point(n, v, freq / jack_state.sample_rate);
 }
 
-void plot_frequencies(int n, double *v, int m, struct point *data, double A, double B)
+void plot_frequencies_logscale(int n, double *v, int m, struct point *data, double A, double B)
 {
 	for (size_t i = 0; i < m; i++) {
 		double freq = inv_logscale((double)i / (m - 1), A, B);
