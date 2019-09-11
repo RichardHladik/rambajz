@@ -60,3 +60,18 @@ void plot_frequencies_logscale(int n, double *v, int m, struct point *data, doub
 		data[i] = (struct point){.x = freq, .y = frequency_strength(n, v, freq) / m};
 	}
 }
+
+void plot_frequencies(int n, double *v, struct point *data)
+{
+	C *out = malloc(n * sizeof(*out));
+	for (size_t i = 0; i < n; i++)
+		out[i] = v[i];
+
+	fft(n, out);
+	for (size_t i = 0; i < n / 2; i++) {
+		double freq = (double)i / (n / 2 - 1) * jack_state.sample_rate / 2;
+		data[i] = (struct point){.x = freq, .y = cabs(out[i]) / n * 2};
+	}
+
+	free(out);
+}
