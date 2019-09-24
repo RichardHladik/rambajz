@@ -44,9 +44,7 @@ bool process(struct buffer *buf)
 	if (!analyse(&data, buf, &params))
 		return true;
 
-	printf("%lf %s %lf\n", data.guessed_frequency, tone_name(data.guessed_tone), data.guessed_tone.cents);
 	draw(&data, &params);
-
 	analysis_free(data);
 	return true;
 }
@@ -60,6 +58,11 @@ int main(void)
 	jack_init_client();
 	jack_setup(record, &buf);
 	jack_connect_ports();
-	while (process(&buf))
-		;
+	double period = 1 / 30.;
+	while (1) {
+		double till = now() + period;
+		if (!process(&buf))
+			break;
+		sleep_till(till);
+	}
 }

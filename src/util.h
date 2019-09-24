@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 static void die(const char fmt[], ...)
 {
@@ -21,6 +22,22 @@ inline double logscale(double x, double from, double to) {
 
 inline double inv_logscale(double x, double from, double to) {
 	return exp(log(to / from) * x) * from;
+}
+
+inline double now() {
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return ts.tv_sec + ts.tv_nsec / 1e9;
+}
+
+inline void sleep_till(double timestamp) {
+	double start = now();
+	double duration = timestamp - start;
+	if (duration <= 0)
+		return;
+	struct timespec ts = {.tv_sec = (long long)duration};
+	ts.tv_nsec = 1e9 * (duration - ts.tv_sec);
+	nanosleep(&ts, NULL);
 }
 
 #endif
