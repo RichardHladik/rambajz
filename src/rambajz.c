@@ -15,18 +15,13 @@ const size_t BUFSIZE = (1 << 20);
 int record(jack_nframes_t nframes, void *arg)
 {
 	struct buffer *buf = arg;
-	jack_default_audio_sample_t *in, *out;
+	jack_default_audio_sample_t *in;
 	in = jack_port_get_buffer(jack_state.in_port, nframes);
-	out = jack_port_get_buffer(jack_state.out_port, nframes);
 	double in_double[nframes];
 	for (int i = 0; i < nframes; i++)
 		in_double[i] = in[i];
 
 	buffer_push(buf, in_double, nframes);
-
-	for (int i = 0; i < nframes; i++)
-		out[i] = 0;
-
 	return 0;
 }
 

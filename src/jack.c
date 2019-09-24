@@ -31,10 +31,8 @@ void jack_setup(JackProcessCallback callback, void *arg)
 
 	jack_state.in_port = jack_port_register(jack_state.client, "in",
 			JACK_DEFAULT_AUDIO_TYPE, JackPortIsInput, 0);
-	jack_state.out_port = jack_port_register(jack_state.client, "out",
-			JACK_DEFAULT_AUDIO_TYPE, JackPortIsOutput, 0);
 
-	if (!jack_state.in_port || !jack_state.out_port)
+	if (!jack_state.in_port)
 		die("jack_setup: jack_port_register failed.\n");
 
 	err = jack_activate(jack_state.client);
@@ -48,10 +46,6 @@ void jack_connect_ports(void)
 {
 	const char **ins = jack_get_ports(jack_state.client, "mpv.*:out_0", NULL,
 			JackPortIsOutput);
-	const char **outs = jack_get_ports(jack_state.client, NULL, NULL,
-			JackPortIsPhysical | JackPortIsInput);
-	/* It's correct to assign all ports with JackPortsIs*Output* to *ins*,
-	 * because we take physical ports that *output* data as our *inputs*. */
 
 	for (const char **port = ins; port && *port; port++) {
 		int err = jack_connect(jack_state.client, *port,
@@ -60,15 +54,7 @@ void jack_connect_ports(void)
 			die("jack_connect failed for port %s: err = %d\n", *port, err);
 	}
 
-	for (const char **port = outs; port && *port; port++) {
-		int err = jack_connect(jack_state.client,
-				jack_port_name(jack_state.out_port), *port);
-		if (err)
-			die("jack_connect failed for port %s: err = %d\n", *port, err);
-	}
-
 	jack_free(ins);
-	jack_free(outs);
 }
 
 /* Tears down the JACK connection, dies on errors. */
