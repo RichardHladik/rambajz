@@ -4,11 +4,13 @@
 #include <unistd.h>
 #include "buffer.h"
 #include "fourier.h"
+#include "scale.h"
 
 struct analysis_data {
 	struct point *plot;
 	size_t plot_size;
 	double guessed_frequency;
+	struct tone guessed_tone;
 };
 
 struct analysis_params {

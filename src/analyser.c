@@ -52,6 +52,7 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 
 	double guess = top_frequency(data->plot, data->plot_size);
 	data->guessed_frequency = estimate_frequency(v, n, guess, 10);
+	data->guessed_tone = calc_tone(data->guessed_frequency);
 
 finish:
 	free(v);

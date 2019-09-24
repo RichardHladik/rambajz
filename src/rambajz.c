@@ -5,6 +5,7 @@
 #include "analyser.h"
 #include "buffer.h"
 #include "jack.h"
+#include "scale.h"
 #include "sdl.h"
 #include "util.h"
 
@@ -104,7 +105,7 @@ bool process(struct buffer *buf)
 	if (!analyse(&data, buf, &params))
 		return true;
 
-	printf("%lf\n", data.guessed_frequency);
+	printf("%lf %s %lf\n", data.guessed_frequency, tone_name(data.guessed_tone), data.guessed_tone.cents);
 	draw(&data, &params);
 
 	analysis_free(data);
