@@ -57,7 +57,7 @@ void plot_frequencies_logscale(int n, double *v, int m, struct point *data, doub
 {
 	for (size_t i = 0; i < m; i++) {
 		double freq = inv_logscale((double)i / (m - 1), A, B);
-		data[i] = (struct point){.x = freq, .y = frequency_strength(n, v, freq) / m};
+		data[i] = (struct point){.x = freq, .y = frequency_strength(n, v, freq) / n};
 	}
 }
 
