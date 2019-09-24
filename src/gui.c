@@ -23,21 +23,24 @@ bool interact(struct analysis_params *params, struct viewport_t *viewport, const
 		if (ev.type == SDL_KEYDOWN && (modstate & blacklist) == 0) {
 			static const double zoom = 2;
 			static const double shift = 1/4.;
-			SDL_Scancode key = ev.key.keysym.scancode;
+			SDL_Keycode key = ev.key.keysym.sym;
 			switch (key) {
-			case SDL_SCANCODE_J:
+			case SDLK_q:
+			case SDLK_ESCAPE:
+				return false;
+			case SDLK_j:
 				width /= zoom;
 				break;
-			case SDL_SCANCODE_K:
+			case SDLK_k:
 				width *= zoom;
 				break;
-			case SDL_SCANCODE_H:
+			case SDLK_h:
 				center -= width * shift;
 				break;
-			case SDL_SCANCODE_L:
+			case SDLK_l:
 				center += width * shift;
 				break;
-			case SDL_SCANCODE_D:
+			case SDLK_d:
 				params->dist = (params->dist + 1) % DISTRIBUTION_CNT;
 				break;
 			default:
