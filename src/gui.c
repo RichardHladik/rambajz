@@ -1,5 +1,6 @@
 #include "gui.h"
 #include <stdbool.h>
+#include "SDL_FontCache.h"
 #include "analyser.h"
 #include "sdl.h"
 #include "util.h"
@@ -61,6 +62,7 @@ bool interact(struct analysis_params *params, struct viewport_t *viewport, const
 
 	params->min_freq = exp(viewport->A);
 	params->max_freq = exp(viewport->B);
+	return true;
 }
 
 void plot_interval(double x0, double x1, double y) {
@@ -88,8 +90,27 @@ void draw_plot(size_t n, const struct point *data, double A, double B)
 	}
 }
 
+void draw_note(const struct analysis_data *data)
+{
+	static FC_Font *font = NULL;
+	if (!font) {
+		font = FC_CreateFont();
+		FC_LoadFont(font, sdl_state.ren, "/usr/share/fonts/TTF/DejaVuSans.ttf", 50, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
+	}
+
+	double split = (data->guessed_tone.cents + 50) / 100;
+	SDL_Rect rect = {.h = 60, .w = split * sdl_state.w, .x = 0, .y = 0};
+	SDL_SetRenderDrawColor(sdl_state.ren, 0, 255, 0, 255);
+	SDL_RenderFillRect(sdl_state.ren, &rect);
+	rect.w = (1 - split) * sdl_state.w;
+	rect.x = split * sdl_state.w;
+	SDL_SetRenderDrawColor(sdl_state.ren, 0, 127, 0, 255);
+
+	SDL_RenderFillRect(sdl_state.ren, &rect);
+	FC_DrawAlign(font, sdl_state.ren, sdl_state.w / 2 - 50, 0, FC_ALIGN_LEFT, "%s (%02.2f)", tone_name(data->guessed_tone), data->guessed_tone.cents);
+}
+
 void draw(const struct analysis_data *data, const struct analysis_params *params) {
-	SDL_Rect rect = {.h = sdl_state.h, .w = sdl_state.w, .x = 0, .y = 0};
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 0, 0, 255);
 	SDL_RenderClear(sdl_state.ren);
 
@@ -98,5 +119,6 @@ void draw(const struct analysis_data *data, const struct analysis_params *params
 	SDL_SetRenderDrawColor(sdl_state.ren, 255, 0, 0, 255);
 	double guessed = logscale(data->guessed_frequency, params->min_freq, params->max_freq);
 	plot_interval(guessed, guessed, 1);
+	draw_note(data);
 	SDL_RenderPresent(sdl_state.ren);
 }

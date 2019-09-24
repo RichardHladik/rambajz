@@ -1,6 +1,6 @@
 C := gcc
 CFLAGS := -O2
-LDFLAGS := $(shell pkg-config --libs jack) $(shell pkg-config --libs sdl2) -lm
+LDFLAGS := $(shell pkg-config --libs jack) $(shell pkg-config --libs sdl2) -lm -lSDL2_ttf
 COMPILE = ${C} ${DEPFLAGS} -std=c11 $(shell pkg-config --cflags sdl2) ${CFLAGS} $< -o $@ -c
 
 SRCS := $(patsubst src/%,%,$(wildcard src/*.c))
