@@ -99,15 +99,16 @@ void draw_note(const struct analysis_data *data)
 	}
 
 	double split = (data->guessed_tone.cents + 50) / 100;
-	SDL_Rect rect = {.h = 60, .w = split * sdl_state.w, .x = 0, .y = 0};
+	SDL_Rect rect = {.h = 60, .w = sdl_state.w, .x = 0, .y = 0};
+	SDL_SetRenderDrawColor(sdl_state.ren, 0, 127, 0, 255);
+	SDL_RenderFillRect(sdl_state.ren, &rect);
+	rect.w = fabs(split - .5) * sdl_state.w;
+	rect.x = fmin(split, .5) * sdl_state.w;
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 255, 0, 255);
 	SDL_RenderFillRect(sdl_state.ren, &rect);
-	rect.w = (1 - split) * sdl_state.w;
-	rect.x = split * sdl_state.w;
-	SDL_SetRenderDrawColor(sdl_state.ren, 0, 127, 0, 255);
 
-	SDL_RenderFillRect(sdl_state.ren, &rect);
-	FC_DrawAlign(font, sdl_state.ren, sdl_state.w / 2 - 50, 0, FC_ALIGN_LEFT, "%s (%02.2f)", tone_name(data->guessed_tone), data->guessed_tone.cents);
+	FC_DrawAlign(font, sdl_state.ren, 0, 0, FC_ALIGN_LEFT, "%s (%+d cents)", tone_name(data->guessed_tone), (int)round(data->guessed_tone.cents));
+	FC_DrawAlign(font, sdl_state.ren, sdl_state.w, 0, FC_ALIGN_RIGHT, "%.2f Hz", data->guessed_frequency);
 }
 
 void draw(const struct analysis_data *data, const struct analysis_params *params) {
