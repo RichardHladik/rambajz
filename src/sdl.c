@@ -1,3 +1,4 @@
+#include "misc.h"
 #include "sdl.h"
 #include "util.h"
 
@@ -8,7 +9,7 @@ void sdl_init(void)
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		die("sdl_init: SDL_Init failed: %s\n", SDL_GetError());
 
-	sdl_state.win = SDL_CreateWindow("ahoj", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, sdl_state.w, sdl_state.h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+	sdl_state.win = SDL_CreateWindow(PROGRAM_FULLNAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, sdl_state.w, sdl_state.h, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 	if (!sdl_state.win)
 		die("sdl_init: SDL_CreateWindow failed: %s\n", SDL_GetError());
 
