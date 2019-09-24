@@ -39,17 +39,6 @@ struct analysis_data *analyse(struct analysis_data *data, struct buffer *buf, co
 	data->plot = malloc(data->plot_size * sizeof(*data->plot));
 	plot_frequencies(n, v, data->plot);
 
-	static struct {
-		struct point *plot;
-		struct analysis_params params;
-	} old = {NULL, {0}};
-
-	if (!old.plot)
-		old.plot = malloc(data->plot_size * sizeof(*data->plot));
-
-	old.params = *params;
-	memcpy(old.plot, data->plot, data->plot_size * sizeof(*data->plot));
-
 	double guess = top_frequency(data->plot, data->plot_size);
 	data->guessed_frequency = estimate_frequency(v, n, guess, 10);
 	data->guessed_tone = calc_tone(data->guessed_frequency);
