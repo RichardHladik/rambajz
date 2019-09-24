@@ -13,7 +13,14 @@ struct analysis_data {
 	struct tone guessed_tone;
 };
 
+enum analysis_distribution {
+	DISTRIBUTION_LINEAR,
+	DISTRIBUTION_LOGSCALE,
+	DISTRIBUTION_CNT,
+};
+
 struct analysis_params {
+	enum analysis_distribution dist;
 	double min_freq;
 	double max_freq;
 };

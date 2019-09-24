@@ -37,7 +37,7 @@ bool process(struct buffer *buf)
 {
 	const double min_freq = 20;
 	const double max_freq = jack_state.sample_rate / 2;
-	struct analysis_params params = {0};
+	static struct analysis_params params = {.dist = DISTRIBUTION_LOGSCALE};
 	static struct viewport_t {
 		double A;
 		double B;
@@ -77,6 +77,9 @@ bool process(struct buffer *buf)
 				break;
 			case SDL_SCANCODE_L:
 				center += width * shift;
+				break;
+			case SDL_SCANCODE_D:
+				params.dist = (params.dist + 1) % DISTRIBUTION_CNT;
 				break;
 			default:
 				break;
