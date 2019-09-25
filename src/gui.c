@@ -98,7 +98,7 @@ void draw_note(const struct analysis_data *data)
 	static FC_Font *font = NULL;
 	if (!font) {
 		font = FC_CreateFont();
-		FC_LoadFont(font, sdl_state.ren, "/usr/share/fonts/TTF/DejaVuSans.ttf", 50, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
+		FC_LoadFont(font, sdl_state.ren, "DejaVuSans.ttf", 50, FC_MakeColor(255, 255, 255, 255), TTF_STYLE_NORMAL);
 	}
 
 	double split = (data->guessed_tone.cents + 50) / 100;
