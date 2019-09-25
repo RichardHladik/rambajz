@@ -2,7 +2,7 @@
 
 void jack_init_client(void);
 void jack_setup(JackProcessCallback, void *);
-void jack_connect_ports(void);
+void jack_connect_ports(const char *wildcard);
 
 void jack_cleanup(void);
 static void jack_shutdown_callback(void *);

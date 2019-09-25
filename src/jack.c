@@ -42,9 +42,9 @@ void jack_setup(JackProcessCallback callback, void *arg)
 
 /* Connects the client to all physical inputs and outputs. Dies if there are
  * none. */
-void jack_connect_ports(void)
+void jack_connect_ports(const char *wildcard)
 {
-	const char **ins = jack_get_ports(jack_state.client, "mpv.*:out_0", NULL,
+	const char **ins = jack_get_ports(jack_state.client, wildcard, NULL,
 			JackPortIsOutput);
 
 	for (const char **port = ins; port && *port; port++) {

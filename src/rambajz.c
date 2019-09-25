@@ -49,7 +49,8 @@ bool process(struct buffer *buf)
 	return true;
 }
 
-int main(void)
+
+int main(int argc, char *argv[])
 {
 	struct buffer buf = {.s = 0, .e = 0, .size = BUFSIZE};
 	buf.data = malloc(buf.size * sizeof(*buf.data));
@@ -57,7 +58,12 @@ int main(void)
 	sdl_init();
 	jack_init_client();
 	jack_setup(record, &buf);
-	jack_connect_ports();
+	static const char default_ports[] = "system:capture.*";
+	const char *port_wildcard = default_ports;
+	if (argc >= 2)
+		port_wildcard = argv[1];
+
+	jack_connect_ports(port_wildcard);
 	double period = 1 / 30.;
 	while (1) {
 		double till = now() + period;
