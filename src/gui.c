@@ -110,8 +110,12 @@ void draw_note(const struct analysis_data *data)
 	SDL_SetRenderDrawColor(sdl_state.ren, 0, 255, 0, 255);
 	SDL_RenderFillRect(sdl_state.ren, &rect);
 
-	FC_DrawAlign(font, sdl_state.ren, 0, 0, FC_ALIGN_LEFT, "%s (%+d cents)", tone_name(data->guessed_tone), (int)round(data->guessed_tone.cents));
-	FC_DrawAlign(font, sdl_state.ren, sdl_state.w, 0, FC_ALIGN_RIGHT, "%.2f Hz", data->guessed_frequency);
+	if (data->guessed_tone.semitone >= 0) {
+		FC_DrawAlign(font, sdl_state.ren, 0, 0, FC_ALIGN_LEFT, " %s (%+d cents)", tone_name(data->guessed_tone), (int)round(data->guessed_tone.cents));
+		FC_DrawAlign(font, sdl_state.ren, sdl_state.w, 0, FC_ALIGN_RIGHT, "%.2f Hz ", data->guessed_frequency);
+	} else {
+		FC_DrawAlign(font, sdl_state.ren, sdl_state.w / 2, 0, FC_ALIGN_CENTER, "No signal.");
+	}
 }
 
 void draw(const struct analysis_data *data, const struct analysis_params *params) {
