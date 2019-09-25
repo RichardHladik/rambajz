@@ -16,21 +16,21 @@ static void die(const char fmt[], ...)
 	exit(1);
 }
 
-inline double logscale(double x, double from, double to) {
+static inline double logscale(double x, double from, double to) {
 	return (log(x) - log(from)) / (log(to) - log(from));
 }
 
-inline double inv_logscale(double x, double from, double to) {
+static inline double inv_logscale(double x, double from, double to) {
 	return exp(log(to / from) * x) * from;
 }
 
-inline double now() {
+static inline double now() {
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC, &ts);
 	return ts.tv_sec + ts.tv_nsec / 1e9;
 }
 
-inline void sleep_till(double timestamp) {
+static void sleep_till(double timestamp) {
 	double start = now();
 	double duration = timestamp - start;
 	if (duration <= 0)
