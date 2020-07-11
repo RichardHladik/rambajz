@@ -7,8 +7,10 @@ void jack_connect_ports(const char *wildcard);
 void jack_cleanup(void);
 static void jack_shutdown_callback(void *);
 
-struct {
+struct jack_state_t {
 	jack_client_t *client;
 	jack_port_t *in_port, *out_port;
 	jack_nframes_t sample_rate;
-} jack_state;
+};
+
+extern struct jack_state_t jack_state;

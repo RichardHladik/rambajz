@@ -3,6 +3,8 @@
 #include "util.h"
 #include "misc.h"
 
+struct jack_state_t jack_state;
+
 /* Connects the client to the JACK server, dies on failure. */
 void jack_init_client(void)
 {

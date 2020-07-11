@@ -2,6 +2,8 @@
 #include "sdl.h"
 #include "util.h"
 
+struct sdl_state_t sdl_state;
+
 void sdl_init(void)
 {
 	sdl_state.w = 1024;

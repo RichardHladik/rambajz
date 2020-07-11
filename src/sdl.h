@@ -3,11 +3,13 @@
 
 #include <SDL.h>
 
-struct {
+struct sdl_state_t {
 	SDL_Window *win;
 	SDL_Renderer *ren;
 	int w, h;
-} sdl_state;
+};
+
+extern struct sdl_state_t sdl_state;
 
 void sdl_init(void);
 void sdl_teardown(void);
